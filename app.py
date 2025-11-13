@@ -1,29 +1,12 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import json
-import os
 from uuid import uuid4
+import requests
+import re
+from api.utils import load_data, save_data
 
 app = Flask(__name__)
 CORS(app)
-
-DATA_FILE = 'data.json'
-
-def load_data():
-    """Load data from JSON file"""
-    if os.path.exists(DATA_FILE):
-        with open(DATA_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
-    return {
-        'instances': [],
-        'resourcePacks': [],
-        'customText': ''
-    }
-
-def save_data(data):
-    """Save data to JSON file"""
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2, ensure_ascii=False)
 
 # Instances endpoints
 @app.route('/api/instances', methods=['GET'])
@@ -104,6 +87,88 @@ def save_custom_text():
     data['customText'] = text_data.get('text', '')
     save_data(data)
     return jsonify({'message': 'Text saved'}), 200
+
+# GitHub import endpoint
+@app.route('/api/import-github', methods=['POST'])
+def import_from_github():
+    try:
+        repo_url = request.json.get('repoUrl', '').strip()
+        item_type = request.json.get('type', 'instance')  # 'instance' or 'pack'
+        
+        if not repo_url:
+            return jsonify({'error': 'Repository URL is required'}), 400
+        
+        # Extract owner and repo from GitHub URL
+        # Supports formats: https://github.com/owner/repo or https://github.com/owner/repo/
+        match = re.match(r'https?://github\.com/([^/]+)/([^/]+)/?', repo_url)
+        if not match:
+            return jsonify({'error': 'Invalid GitHub repository URL'}), 400
+        
+        owner, repo = match.groups()
+        
+        # Try to get the latest release
+        api_url = f'https://api.github.com/repos/{owner}/{repo}/releases/latest'
+        response = requests.get(api_url, timeout=10)
+        
+        if response.status_code == 404:
+            # No releases, try to get repo info and use main branch
+            repo_info_url = f'https://api.github.com/repos/{owner}/{repo}'
+            repo_response = requests.get(repo_info_url, timeout=10)
+            if repo_response.status_code != 200:
+                return jsonify({'error': 'Repository not found'}), 404
+            
+            repo_data = repo_response.json()
+            name = repo_data.get('name', repo)
+            description = repo_data.get('description', '')
+            default_branch = repo_data.get('default_branch', 'main')
+            
+            # Create a download URL for the repository as a zip
+            download_url = f'https://github.com/{owner}/{repo}/archive/refs/heads/{default_branch}.zip'
+            
+            new_item = {
+                'id': str(uuid4()),
+                'name': name,
+                'description': description,
+                'url': download_url,
+                'version': default_branch
+            }
+        elif response.status_code == 200:
+            release_data = response.json()
+            name = release_data.get('name', repo)
+            description = release_data.get('body', '')[:200]  # Limit description length
+            tag = release_data.get('tag_name', '')
+            
+            # Get the first asset download URL, or use the source code zip
+            assets = release_data.get('assets', [])
+            if assets and len(assets) > 0:
+                download_url = assets[0].get('browser_download_url', '')
+            else:
+                download_url = f'https://github.com/{owner}/{repo}/archive/refs/tags/{tag}.zip'
+            
+            new_item = {
+                'id': str(uuid4()),
+                'name': name,
+                'description': description,
+                'url': download_url,
+                'version': tag
+            }
+        else:
+            return jsonify({'error': 'Failed to fetch repository information'}), response.status_code
+        
+        # Add to the appropriate list
+        data = load_data()
+        if item_type == 'instance':
+            data['instances'].append(new_item)
+        else:
+            data['resourcePacks'].append(new_item)
+        
+        save_data(data)
+        return jsonify(new_item), 201
+        
+    except requests.RequestException as e:
+        return jsonify({'error': f'Failed to fetch from GitHub: {str(e)}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

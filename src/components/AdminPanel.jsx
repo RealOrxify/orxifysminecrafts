@@ -167,6 +167,51 @@ function AdminPanel({
         </div>
       </div>
 
+      {/* GitHub Import */}
+      <div className="glass-card rounded-xl p-6 mt-6">
+        <h3 className="text-xl font-semibold text-white mb-4">Import from GitHub</h3>
+        <form onSubmit={handleGitHubImport} className="space-y-4">
+          <input
+            type="url"
+            placeholder="GitHub Repository URL (e.g., https://github.com/owner/repo)"
+            value={githubImport.repoUrl}
+            onChange={(e) => setGithubImport({ ...githubImport, repoUrl: e.target.value })}
+            className="w-full px-4 py-2 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
+          />
+          <div className="flex items-center gap-4">
+            <label className="text-white/80 flex items-center gap-2">
+              <input
+                type="radio"
+                name="importType"
+                value="instance"
+                checked={githubImport.type === 'instance'}
+                onChange={(e) => setGithubImport({ ...githubImport, type: e.target.value })}
+                className="accent-white/50"
+              />
+              Instance
+            </label>
+            <label className="text-white/80 flex items-center gap-2">
+              <input
+                type="radio"
+                name="importType"
+                value="pack"
+                checked={githubImport.type === 'pack'}
+                onChange={(e) => setGithubImport({ ...githubImport, type: e.target.value })}
+                className="accent-white/50"
+              />
+              Resource Pack
+            </label>
+          </div>
+          <button
+            type="submit"
+            disabled={importing}
+            className="w-full px-4 py-2 bg-white/30 hover:bg-white/40 disabled:bg-white/10 disabled:cursor-not-allowed text-white rounded-lg transition"
+          >
+            {importing ? 'Importing...' : 'Import from GitHub'}
+          </button>
+        </form>
+      </div>
+
       {/* Edit Text Content */}
       <div className="glass-card rounded-xl p-6 mt-6">
         <h3 className="text-xl font-semibold text-white mb-4">Edit Page Text</h3>

@@ -99,6 +99,29 @@ function App() {
     }
   }
 
+  const importFromGitHub = async (repoUrl, type) => {
+    try {
+      const response = await axios.post(`${API_BASE}/import-github`, {
+        repoUrl,
+        type
+      })
+      
+      if (type === 'instance') {
+        setInstances([...instances, response.data])
+      } else {
+        setResourcePacks([...resourcePacks, response.data])
+      }
+      
+      alert('Successfully imported from GitHub!')
+      return true
+    } catch (error) {
+      console.error('Error importing from GitHub:', error)
+      const errorMessage = error.response?.data?.error || 'Failed to import from GitHub'
+      alert(errorMessage)
+      return false
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -117,6 +140,7 @@ function App() {
             onAddInstance={addInstance}
             onAddResourcePack={addResourcePack}
             onSaveText={saveCustomText}
+            onImportFromGitHub={importFromGitHub}
             instances={instances}
             resourcePacks={resourcePacks}
             onDeleteInstance={deleteInstance}
