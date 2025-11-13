@@ -80,13 +80,15 @@ function AdminPanel({
   }
 
   return (
-    <div className="admin-panel rounded-2xl p-6 mb-8">
-      <h2 className="text-2xl font-bold text-white mb-4">Admin Panel</h2>
+    <div className="admin-panel rounded-2xl p-8 mb-10 shadow-2xl">
+      <h2 className="text-3xl font-bold text-white mb-6 text-center">⚙️ Admin Panel</h2>
       
       <div className="grid md:grid-cols-2 gap-6">
         {/* Add Instance Form */}
         <div className="glass-card rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Add Instance</h3>
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            🎮 Add Instance
+          </h3>
           <form onSubmit={handleInstanceSubmit} className="space-y-4">
             <input
               type="text"
@@ -118,16 +120,18 @@ function AdminPanel({
             />
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-white/30 hover:bg-white/40 text-white rounded-lg transition"
+              className="w-full px-4 py-2.5 bg-gradient-to-r from-white/30 to-white/20 hover:from-white/40 hover:to-white/30 text-white rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              Add Instance
+              ➕ Add Instance
             </button>
           </form>
         </div>
 
         {/* Add Resource Pack Form */}
         <div className="glass-card rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-white mb-4">Add Resource Pack</h3>
+          <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+            🎨 Add Resource Pack
+          </h3>
           <form onSubmit={handlePackSubmit} className="space-y-4">
             <input
               type="text"
@@ -159,9 +163,9 @@ function AdminPanel({
             />
             <button
               type="submit"
-              className="w-full px-4 py-2 bg-white/30 hover:bg-white/40 text-white rounded-lg transition"
+              className="w-full px-4 py-2.5 bg-gradient-to-r from-white/30 to-white/20 hover:from-white/40 hover:to-white/30 text-white rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              Add Resource Pack
+              ➕ Add Resource Pack
             </button>
           </form>
         </div>
@@ -169,7 +173,9 @@ function AdminPanel({
 
       {/* GitHub Import */}
       <div className="glass-card rounded-xl p-6 mt-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Import from GitHub</h3>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          🔗 Import from GitHub
+        </h3>
         <form onSubmit={handleGitHubImport} className="space-y-4">
           <input
             type="url"
@@ -205,16 +211,21 @@ function AdminPanel({
           <button
             type="submit"
             disabled={importing}
-            className="w-full px-4 py-2 bg-white/30 hover:bg-white/40 disabled:bg-white/10 disabled:cursor-not-allowed text-white rounded-lg transition"
+            className="w-full px-4 py-2.5 bg-gradient-to-r from-white/30 to-white/20 hover:from-white/40 hover:to-white/30 disabled:from-white/10 disabled:to-white/5 disabled:cursor-not-allowed text-white rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 disabled:transform-none"
           >
-            {importing ? 'Importing...' : 'Import from GitHub'}
+            {importing ? '⏳ Importing...' : '🔗 Import from GitHub'}
           </button>
         </form>
       </div>
 
       {/* Edit Text Content */}
       <div className="glass-card rounded-xl p-6 mt-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Edit Page Text</h3>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          ✏️ Edit Page Text
+        </h3>
+        <p className="text-white/60 text-sm mb-4">
+          Supports Markdown: **bold**, *italic*, [links](url), # headers
+        </p>
         <textarea
           rows="4"
           placeholder="Add custom text/content for the page..."
@@ -224,15 +235,17 @@ function AdminPanel({
         />
         <button
           onClick={handleSaveText}
-          className="mt-4 px-4 py-2 bg-white/30 hover:bg-white/40 text-white rounded-lg transition"
+          className="mt-4 px-5 py-2.5 bg-gradient-to-r from-white/30 to-white/20 hover:from-white/40 hover:to-white/30 text-white rounded-lg transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105"
         >
-          Save Text
+          💾 Save Text
         </button>
       </div>
 
       {/* Manage Items */}
       <div className="glass-card rounded-xl p-6 mt-6">
-        <h3 className="text-xl font-semibold text-white mb-4">Manage Items</h3>
+        <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          📋 Manage Items
+        </h3>
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {instances.length === 0 && resourcePacks.length === 0 ? (
             <p className="text-white/60">No items to manage.</p>
@@ -243,9 +256,9 @@ function AdminPanel({
                   <span className="text-white">{instance.name} (instance)</span>
                   <button
                     onClick={() => onDeleteInstance(instance.id)}
-                    className="px-3 py-1 bg-red-500/30 hover:bg-red-500/40 text-white rounded transition text-sm"
+                    className="px-3 py-1.5 bg-red-500/30 hover:bg-red-500/40 text-white rounded-lg transition-all duration-200 text-sm font-medium shadow hover:shadow-lg"
                   >
-                    Delete
+                    🗑️ Delete
                   </button>
                 </div>
               ))}
@@ -254,9 +267,9 @@ function AdminPanel({
                   <span className="text-white">{pack.name} (pack)</span>
                   <button
                     onClick={() => onDeleteResourcePack(pack.id)}
-                    className="px-3 py-1 bg-red-500/30 hover:bg-red-500/40 text-white rounded transition text-sm"
+                    className="px-3 py-1.5 bg-red-500/30 hover:bg-red-500/40 text-white rounded-lg transition-all duration-200 text-sm font-medium shadow hover:shadow-lg"
                   >
-                    Delete
+                    🗑️ Delete
                   </button>
                 </div>
               ))}

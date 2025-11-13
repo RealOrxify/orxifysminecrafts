@@ -125,7 +125,10 @@ function App() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <div className="glass rounded-2xl p-8 text-center">
+          <div className="text-white text-2xl font-semibold mb-2">Loading...</div>
+          <div className="text-white/60">Fetching your downloads</div>
+        </div>
       </div>
     )
   }
@@ -133,7 +136,7 @@ function App() {
   return (
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <Header onToggleAdmin={() => setShowAdmin(!showAdmin)} />
+        <Header onToggleAdmin={() => setShowAdmin(!showAdmin)} isAdmin={showAdmin} />
         
         {showAdmin && (
           <AdminPanel
@@ -151,8 +154,8 @@ function App() {
 
         {customText && <CustomTextSection text={customText} />}
 
-        <InstancesSection instances={instances} onDelete={deleteInstance} />
-        <ResourcePacksSection packs={resourcePacks} onDelete={deleteResourcePack} />
+        <InstancesSection instances={instances} onDelete={deleteInstance} isAdmin={showAdmin} />
+        <ResourcePacksSection packs={resourcePacks} onDelete={deleteResourcePack} isAdmin={showAdmin} />
       </div>
     </div>
   )
